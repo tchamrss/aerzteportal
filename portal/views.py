@@ -49,7 +49,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     """
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
