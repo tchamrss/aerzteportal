@@ -9,17 +9,22 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 
 from portal.serializers import AppointmentSerializer, PatientSerializer, DoctorSerializer
-from .models import Patient, Appointment, Doctor
+from users.models import Patient, Appointment, Doctor
+from rest_framework.authentication import TokenAuthentication
+from django.contrib.auth import authenticate
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import get_user_model,authenticate
+from rest_framework.views import APIView
+from django.core.exceptions import ObjectDoesNotExist
 
-# Create your views here.
 class PatientViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows patients to be viewed or edited.
     """
-    queryset = Patient.objects.all().order_by('-first_name')
+    queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     """
@@ -28,20 +33,19 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
-    
     def get_queryset(self):
-        # Hole den angemeldeten User aus dem Request-Objekt
+        # Holen Sie den angemeldeten Benutzer aus dem Anfrageobjekt
         user = self.request.user
-
-        # Hole den Doctor, dem der User gehört
-        doctor = Doctor.objects.get(user=user)
-
-        # Filtere die Appointments nach dem Doctor
-        queryset = Appointment.objects.filter(doctor=doctor)
-
-        return queryset
-
+        doctor_qs = Doctor.objects.filter(user=user)
+        patient_qs = Patient.objects.filter(user=user)
+        if doctor_qs.exists():
+            doctor_ins = doctor_qs.first()
+            return Appointment.objects.filter(doctor=doctor_ins)
+        elif patient_qs.exists():
+            patient_ins = patient_qs.first()
+            return Appointment.objects.filter(patient=patient_ins)
+        else:
+            return Appointment.objects.none()   
     
 class DoctorViewSet(viewsets.ModelViewSet): 
     """
@@ -49,7 +53,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
     """
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    #permission_classes = [permissions.IsAuthenticated]
     
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

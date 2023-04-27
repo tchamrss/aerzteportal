@@ -20,7 +20,6 @@ from django.urls import path, include
 from rest_framework import routers
 
 from portal.views import logout_view,PatientViewSet, DoctorViewSet, AppointmentViewSet,DoctorDeleteView, PatientDeleteView, AppointmentDeleteView
-
 router = routers.DefaultRouter()
 router.register(r'patients', PatientViewSet)
 router.register(r'doctors', DoctorViewSet)
@@ -29,6 +28,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('logout/', logout_view),
+    #path('login/', LoginView.as_view()),
     path('doctors/<int:pk>/', DoctorDeleteView.as_view(), name='doctor-delete'),
     path('patients/<int:pk>/', PatientDeleteView.as_view(), name='patient-delete'),
     path('appointments/<int:pk>/', AppointmentDeleteView.as_view(), name='appointment-delete'),

@@ -40,9 +40,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'portal',
+    'users',
     'rest_framework',
 ]
 
+
+
+""" AUTH_USER_MODEL = [
+    'users.Doctor',
+    'users.Patient'
+] """
+AUTH_USER_MODEL = 'auth.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
